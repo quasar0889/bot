@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アシスタントbot</title>
+<!-- マニフェストファイル -->
+<link rel="manifest" href="./manifest.json">
+<!-- サービスワーカーの登録 -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then((registration) => {
+          console.log('ServiceWorker registration successful:', registration);
+        })
+        .catch((error) => {
+          console.error('ServiceWorker registration failed:', error);
+        });
+    });
+  }
+</script>
+ 
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }
+
+    #chat-container {
+      max-width: 500px;
+      margin: 50px auto;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    #chat-window {
+      height: 400px;
+      overflow-y: auto;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .message {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .message img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .message.bot {
+      flex-direction: row;
+    }
+
+    .message.user {
+      flex-direction: row-reverse;
+    }
+
+    .message p {
+      background: #f1f1f1;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 0;
+    }
+
+    .message.user p {
+      background: #d1e7ff;
+    }
+
+    #input-container {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    #send-button {
+      margin-left: 10px;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #send-button:hover {
+      background: #0056b3;
+    }
+        footer {
+      text-align: center;
+      padding: 10px 0;
+      background-color: #f1f1f1;
+      color: #666;
+      font-size: 14px;
+    }
+
+    footer a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <div id="chat-window"></div>
+    <div id="input-container">
+      <input type="text" id="user-input" placeholder="メッセージを入力..." />
+      <button id="send-button">送信</button>
+    </div>
+  </div>
+<footer>
+    Powered by <a href="https://github.com/mesgaki">megaki</a>
+  </footer>
+  <script>
+    const chatWindow = document.getElementById('chat-window');
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+
+    // キーワードと応答のデータベース
+    const responseDatabase = {
+      "こんにちは": "今日はどんなご用件？",
+      "元気": "元気だよ",
+      "天気": "今日の天気は晴れだよ",
+      "ありがとう": "どういたしましてUwU",
+      "さようなら": "ばいばい",
+      "趣味": "Wikipediaクローラーかな",
+      "好きな食べ物": "私はバーチャルだから食べられないけど、見るのは好きだよ",
+      "野獣先輩とは？" : "恥ずかしいことは答えられないよ(´・ω・｀)",
+      
+    };
+
+    // メッセージを追加する関数
+    function addMessage(sender, text) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', sender);
+
+      const icon = document.createElement('img');
+      icon.src = sender === 'bot' 
+        ? 'IMG_1350.jpeg' 
+        : 'IMG_1347.png';
+
+      const messageText = document.createElement('p');
+      messageText.textContent = text;
+
+      messageDiv.appendChild(icon);
+      messageDiv.appendChild(messageText);
+      chatWindow.appendChild(messageDiv);
+
+      // スクロールを一番下に
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // ボットの応答を生成する関数
+    function getBotResponse(userMessage) {
+      // 部分一致で応答を探す
+      for (const key of Object.keys(responseDatabase)) {
+        if (userMessage.includes(key)) {
+          return responseDatabase[key];
+        }
+      }
+      return "そのことについては答えられないよ";
+    }
+
+    // 送信ボタンのイベントリスナー
+    sendButton.addEventListener('click', () => {
+      const userMessage = userInput.value.trim();
+      if (userMessage) {
+        addMessage('user', userMessage); // ユーザーのメッセージを追加
+        userInput.value = '';
+
+        // ボットの応答を追加
+        const botResponse = getBotResponse(userMessage);
+        setTimeout(() => addMessage('bot', botResponse), 500);
+      }
+    });
+  </script>
+</body>
+</html>
