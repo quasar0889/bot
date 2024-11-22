@@ -168,6 +168,11 @@
       "掃除はある？" : "掃除は通常通りあるよ(´ω`)",
       "ロイロ提出してる？" : "五つの提出箱が空だよ",
       "おすすめのプロキシは？" : "proxysneak,phproxy,blockawayなどがあるよ",
+      "SSHスクリプトを実行して" : "実行したいスクリプトをubuntu形式で教えてね",
+      "#!/bin/sh ps ax | grep [r]emote.sh | awk '{print $1}' | xargs kill" : "#!/bin/shecho (Start)./watch_dog.sh 3 $$ &WD_PID=$! trap "ssh remote ~/stop.sh && exit 1" 10",
+
+
+
     };
 
     // メッセージを追加する関数
